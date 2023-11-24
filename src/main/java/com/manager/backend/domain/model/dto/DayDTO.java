@@ -6,16 +6,12 @@ import com.manager.backend.domain.model.Weekly;
 import com.manager.backend.domain.model.Workday;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class DayDTO {
 	
 	private String nombreDia;

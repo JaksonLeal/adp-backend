@@ -7,16 +7,12 @@ import com.manager.backend.domain.model.Day;
 import com.manager.backend.domain.model.Month;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class WeeklyDTO {
 
 	private Date fecha;

@@ -5,27 +5,28 @@ import java.util.Set;
 import com.manager.backend.domain.model.Workday;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class UserDTO {
 
 	private Long cedula;
 
 	private String nombre;
 
-	private boolean activo;
+	private String email;
 
 	private String edad;
 
 	private String numCelular;
 
+	private String role;
+
+	private Boolean status;
+
 	private Set<Workday> jornada;
+	
 }
