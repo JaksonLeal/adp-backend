@@ -2,7 +2,7 @@ package com.manager.backend.domain.model.dto;
 
 import java.util.Set;
 
-import com.manager.backend.domain.model.Weekly;
+import com.manager.backend.domain.model.Week;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +17,6 @@ public class MonthDTO {
 
 	private String anio;
 
-	private Set<Weekly> semana;
+	private Set<Week> semana;
 
 }

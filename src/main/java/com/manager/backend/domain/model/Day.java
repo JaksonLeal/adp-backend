@@ -17,6 +17,6 @@ public class Day {
 
 	private Set<Workday> jornada;
 
-	private Weekly semana;
+	private Week semana;
 
 }

@@ -17,6 +17,6 @@ public class Month {
 
 	private String anio;
 
-	private Set<Weekly> semana;
+	private Set<Week> semana;
 
 }

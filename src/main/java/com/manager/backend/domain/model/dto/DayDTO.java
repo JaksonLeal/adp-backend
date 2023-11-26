@@ -2,7 +2,7 @@ package com.manager.backend.domain.model.dto;
 
 import java.util.Set;
 
-import com.manager.backend.domain.model.Weekly;
+import com.manager.backend.domain.model.Week;
 import com.manager.backend.domain.model.Workday;
 
 import lombok.AllArgsConstructor;
@@ -18,6 +18,6 @@ public class DayDTO {
 
 	private Set<Workday> jornada;
 
-	private Weekly semana;
+	private Week semana;
 
 }

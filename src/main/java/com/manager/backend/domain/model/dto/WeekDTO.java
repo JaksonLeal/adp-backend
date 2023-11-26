@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WeeklyDTO {
+public class WeekDTO {
 
 	private Date fecha;
 

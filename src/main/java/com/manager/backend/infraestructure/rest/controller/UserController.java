@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.manager.backend.application.usecases.UserCases;
 import com.manager.backend.infraestructure.adapter.entity.UserEntity;
-import com.manager.backend.infraestructure.adapter.exception.UserNotFoundException;
+import com.manager.backend.infraestructure.adapter.exception.UserException;
 
 @RestController
 @RequestMapping(path = "/user")
@@ -35,7 +35,8 @@ public class UserController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new ResponseEntity<String>(new UserNotFoundException("controller singup").getMessage(),
+		return new ResponseEntity<String>(
+				new UserException(HttpStatus.INTERNAL_SERVER_ERROR, "no se pudo registrar").getMessage(),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
@@ -46,6 +47,8 @@ public class UserController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new ResponseEntity<String>(new UserNotFoundException().getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<String>(
+				new UserException(HttpStatus.INTERNAL_SERVER_ERROR, "no se pudo registrar").getMessage(),
+				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
