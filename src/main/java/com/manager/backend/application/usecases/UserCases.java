@@ -8,8 +8,8 @@ import com.manager.backend.infraestructure.adapter.entity.UserEntity;
 
 public interface UserCases {
 
-	ResponseEntity<String> singUp(UserEntity user);
+	ResponseEntity<?> singUp(UserEntity user);
 
-	ResponseEntity<String> login(Map<String, String> requestMap);
+	ResponseEntity<?> login(Map<String, String> requestMap);
 
 }

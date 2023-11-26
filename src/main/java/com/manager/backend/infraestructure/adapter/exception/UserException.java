@@ -1,22 +1,22 @@
 package com.manager.backend.infraestructure.adapter.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.context.request.WebRequest;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class UserException extends Exception {
 
 	private static final long serialVersionUID = 1104478034519367432L;
 
 	private HttpStatus errorCode;
-	
-	private String errorMessage;
+
+	public UserException(String errorMessage, HttpStatus errorCode) {
+		super(errorMessage);
+		this.errorCode = errorCode;
+	}
 
 }

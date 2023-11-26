@@ -1,5 +1,6 @@
 package com.manager.backend.application.service;
 
+import java.time.LocalTime;
 import java.util.Map;
 import java.util.Objects;
 
@@ -13,9 +14,10 @@ import org.springframework.stereotype.Service;
 
 import com.manager.backend.application.usecases.UserCases;
 import com.manager.backend.infraestructure.adapter.entity.UserEntity;
-import com.manager.backend.infraestructure.adapter.exception.UserNotFoundException;
+import com.manager.backend.infraestructure.adapter.exception.UserException;
 import com.manager.backend.infraestructure.adapter.repository.UserRepository;
 import com.manager.backend.infraestructure.config.JwtUtil;
+import com.manager.backend.infraestructure.rest.advice.UserAdvice;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,49 +38,44 @@ public class UserService implements UserCases {
 	private JwtUtil jwtUtil;
 
 	@Override
-	public ResponseEntity<String> singUp(UserEntity user) {
+	public ResponseEntity<?> singUp(UserEntity user) {
 		log.info("Registro interno de un usuario{}", user);
-
 		try {
-			if (validateSingudMap(user)) {
+			if (validateSingupMap(user)) {
 				UserEntity userLocal = userRepository.findByEmail(user.getEmail());
 				if (Objects.isNull(userLocal)) {
 					user.setStatus(false);
 					user.setRole("user");
-					userRepository.save(getUserFromMap(user));
-					return new ResponseEntity<String>("Usuario registrado con exito", HttpStatus.CREATED);
+					// userRepository.save(getUserFromMap(user));
+					userRepository.save(user);
+					return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado con exito");
 				} else {
-					return new ResponseEntity<String>(new UserNotFoundException("service singup").getMessage(),
-							HttpStatus.BAD_REQUEST);
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+							.body(new UserException("ya existe un usuario con este email", HttpStatus.BAD_REQUEST));
 
 				}
 			} else {
-				return new ResponseEntity<String>(new UserNotFoundException("service singup").getMessage(),
-						HttpStatus.BAD_REQUEST);
+				 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new UserException("ya existe un usuario con este ", HttpStatus.BAD_REQUEST));
+
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}
-		return new ResponseEntity<String>(new UserNotFoundException("service singup").getMessage(),
-				HttpStatus.INTERNAL_SERVER_ERROR);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(new UserException("ya existe un usuario con  ", HttpStatus.BAD_REQUEST));
+}
+
+	private boolean validateSingupMap(UserEntity user) {
+		return (user.getCedula() != null && user.getEmail() != null && user.getNombre() != null
+				&& user.getPassword() != null);
 	}
 
-	private boolean validateSingudMap(UserEntity user) {
-
-		if (user.getCedula() != null && user.getEmail() != null && user.getNombre() != null
-				&& user.getPassword() != null) {
-			return true;
-		} else {
-			return false;
-		}
-
-	}
-
-	private UserEntity getUserFromMap(UserEntity user) {
-		user.setStatus(false);
-		user.setRole("user");
-		return user;
-	}
+//	private UserEntity getUserFromMap(UserEntity user) {
+//		user.setStatus(false);
+//		user.setRole("user");
+//		return user;
+//	}
 
 	@Override
 	public ResponseEntity<String> login(Map<String, String> requestMap) {

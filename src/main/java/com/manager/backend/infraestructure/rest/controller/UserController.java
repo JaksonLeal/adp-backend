@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.manager.backend.application.usecases.UserCases;
 import com.manager.backend.infraestructure.adapter.entity.UserEntity;
-import com.manager.backend.infraestructure.adapter.exception.UserException;
 
 @RestController
-@RequestMapping(path = "/user")
+@RequestMapping("/user")
 public class UserController {
 
 	@Autowired
@@ -26,29 +25,19 @@ public class UserController {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@PostMapping("/signup")
-	public ResponseEntity<String> registrarUsuario(@RequestBody UserEntity user) {
-		System.out.println("entro a controlador /signup");
-		try {
-			System.out.println(user);
-			user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-			return userCases.singUp(user);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new ResponseEntity<String>(
-				new UserException(HttpStatus.INTERNAL_SERVER_ERROR, "no se pudo registrar").getMessage(),
-				HttpStatus.INTERNAL_SERVER_ERROR);
+	public ResponseEntity<?> registrarUsuario(@RequestBody UserEntity user) {
+		System.out.println("entro a controlador /signup " + user);
+		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+		return userCases.singUp(user);
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody Map<String, String> requestMap) {
+	public ResponseEntity<?> login(@RequestBody Map<String, String> requestMap) {
 		try {
 			return userCases.login(requestMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new ResponseEntity<String>(
-				new UserException(HttpStatus.INTERNAL_SERVER_ERROR, "no se pudo registrar").getMessage(),
-				HttpStatus.INTERNAL_SERVER_ERROR);
+		return ResponseEntity.status(HttpStatus.OK).body("controller login");
 	}
 }
