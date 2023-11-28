@@ -1,6 +1,5 @@
 package com.manager.backend.application.service;
 
-import java.time.LocalTime;
 import java.util.Map;
 import java.util.Objects;
 
@@ -17,7 +16,6 @@ import com.manager.backend.infraestructure.adapter.entity.UserEntity;
 import com.manager.backend.infraestructure.adapter.exception.UserException;
 import com.manager.backend.infraestructure.adapter.repository.UserRepository;
 import com.manager.backend.infraestructure.config.JwtUtil;
-import com.manager.backend.infraestructure.rest.advice.UserAdvice;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,7 +53,7 @@ public class UserService implements UserCases {
 
 				}
 			} else {
-				 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new UserException("ya existe un usuario con este ", HttpStatus.BAD_REQUEST));
 
 			}
@@ -64,7 +62,7 @@ public class UserService implements UserCases {
 		}
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(new UserException("ya existe un usuario con  ", HttpStatus.BAD_REQUEST));
-}
+	}
 
 	private boolean validateSingupMap(UserEntity user) {
 		return (user.getCedula() != null && user.getEmail() != null && user.getNombre() != null
