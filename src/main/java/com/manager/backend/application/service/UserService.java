@@ -36,32 +36,32 @@ public class UserService implements UserCases {
 	private JwtUtil jwtUtil;
 
 	@Override
-	public ResponseEntity<?> singUp(UserEntity user) {
+	public ResponseEntity<String> singUp(UserEntity user) {
 		log.info("Registro interno de un usuario{}", user);
-		try {
-			if (validateSingupMap(user)) {
-				UserEntity userLocal = userRepository.findByEmail(user.getEmail());
-				if (Objects.isNull(userLocal)) {
-					user.setStatus(false);
-					user.setRole("user");
-					// userRepository.save(getUserFromMap(user));
-					userRepository.save(user);
-					return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado con exito");
-				} else {
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-							.body(new UserException("ya existe un usuario con este email", HttpStatus.BAD_REQUEST));
 
-				}
-			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new UserException("ya existe un usuario con este ", HttpStatus.BAD_REQUEST));
-
+		if (validateSingupMap(user)) {
+			UserEntity userLocal;
+			try {
+				userLocal = userRepository.findByEmail(user.getEmail());
+			} catch (Exception e) {
+				return getResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Error de conexion a base de datos");
 			}
-		} catch (Exception exception) {
-			exception.printStackTrace();
+			if (Objects.isNull(userLocal)) {
+				user.setStatus(false);
+				user.setRole("user");
+				try {
+					userRepository.save(user);
+				} catch (Exception e) {
+					return getResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Error de conexion a base de datos");
+				}
+				return getResponseEntity(HttpStatus.CREATED, "Usuario registrado con exito");
+			} else {
+				return getResponseEntity(HttpStatus.CONFLICT, "ya existe un usuario con este email");
+			}
+		} else {
+			return getResponseEntity(HttpStatus.BAD_REQUEST, "Datos incompletos del registro usuario");
 		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(new UserException("ya existe un usuario con  ", HttpStatus.BAD_REQUEST));
+
 	}
 
 	private boolean validateSingupMap(UserEntity user) {
@@ -69,11 +69,9 @@ public class UserService implements UserCases {
 				&& user.getPassword() != null);
 	}
 
-//	private UserEntity getUserFromMap(UserEntity user) {
-//		user.setStatus(false);
-//		user.setRole("user");
-//		return user;
-//	}
+	private ResponseEntity<String> getResponseEntity(HttpStatus hs, String m) {
+		return ResponseEntity.status(hs).body(new UserException(m).getMessage());
+	}
 
 	@Override
 	public ResponseEntity<String> login(Map<String, String> requestMap) {

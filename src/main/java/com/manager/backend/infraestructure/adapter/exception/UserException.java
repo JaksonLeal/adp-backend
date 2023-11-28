@@ -1,26 +1,14 @@
 package com.manager.backend.infraestructure.adapter.exception;
 
-import java.time.LocalDateTime;
+public class UserException extends Exception {
 
-import org.springframework.http.HttpStatus;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7194367677634782052L;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class UserException {
-
-	private int statusCode;
-	private String errorMessage;
-	private LocalDateTime timestamp;
-
-	public UserException(String errorMessage, HttpStatus errorCode) {
-
-		this.statusCode = errorCode.value();
-		this.timestamp = LocalDateTime.now();
-		this.errorMessage = errorMessage;
-
+	public UserException(String errorMessage) {
+		super(errorMessage);
 	}
 
 }
