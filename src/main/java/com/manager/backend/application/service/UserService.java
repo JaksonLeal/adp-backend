@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.manager.backend.application.usecases.UserCases;
+import com.manager.backend.domain.model.constant.UserConstant;
 import com.manager.backend.infraestructure.adapter.entity.UserEntity;
 import com.manager.backend.infraestructure.adapter.exception.UserException;
 import com.manager.backend.infraestructure.adapter.repository.UserRepository;
@@ -44,7 +45,7 @@ public class UserService implements UserCases {
 			try {
 				userLocal = userRepository.findByEmail(user.getEmail());
 			} catch (Exception e) {
-				return getResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Error de conexion a base de datos");
+				return getUserException(HttpStatus.INTERNAL_SERVER_ERROR, UserConstant.DB_BAD_CONNECTION);
 			}
 			if (Objects.isNull(userLocal)) {
 				user.setStatus(false);
@@ -52,14 +53,15 @@ public class UserService implements UserCases {
 				try {
 					userRepository.save(user);
 				} catch (Exception e) {
-					return getResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, "Error de conexion a base de datos");
+					return getUserException(HttpStatus.INTERNAL_SERVER_ERROR, UserConstant.DB_BAD_CONNECTION);
 				}
-				return getResponseEntity(HttpStatus.CREATED, "Usuario registrado con exito");
+				return getUserException(HttpStatus.CREATED, UserConstant.SUCCESSFUL);
 			} else {
-				return getResponseEntity(HttpStatus.CONFLICT, "ya existe un usuario con este email");
+				return getUserException(HttpStatus.CONFLICT,
+						String.format(UserConstant.EMAIL_CONFLICT, user.getEmail()));
 			}
 		} else {
-			return getResponseEntity(HttpStatus.BAD_REQUEST, "Datos incompletos del registro usuario");
+			return getUserException(HttpStatus.BAD_REQUEST, UserConstant.INVALID_DATA);
 		}
 
 	}
@@ -69,7 +71,7 @@ public class UserService implements UserCases {
 				&& user.getPassword() != null);
 	}
 
-	private ResponseEntity<String> getResponseEntity(HttpStatus hs, String m) {
+	private ResponseEntity<String> getUserException(HttpStatus hs, String m) {
 		return ResponseEntity.status(hs).body(new UserException(m).getMessage());
 	}
 
@@ -93,8 +95,8 @@ public class UserService implements UserCases {
 		} catch (Exception e) {
 			log.error("{}", e);
 		}
-		return new ResponseEntity<String>("{\"mensaje\":\"" + "credenciales incorrectas" + "\"}",
-				HttpStatus.BAD_REQUEST);
+		return getUserException(HttpStatus.BAD_REQUEST, String.format(UserConstant.CUSTOM, "credenciales incorrectas"));
+
 	}
 
 }
