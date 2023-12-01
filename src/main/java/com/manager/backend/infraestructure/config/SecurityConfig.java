@@ -19,7 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 public class SecurityConfig {
 
 	@Autowired
-	private JWTauthenticationEntryPoint unauthorizedHandler;
+	private JwtAuthenticationEntryPoint unauthorizedHandler;
 
 	@Autowired
 	private JwtFilter jwtFilter;

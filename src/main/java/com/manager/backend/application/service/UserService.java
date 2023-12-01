@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.manager.backend.application.usecases.UserCases;
@@ -40,12 +39,12 @@ public class UserService implements UserCases {
 	public ResponseEntity<String> singUp(UserEntity user) {
 		log.info("Registro interno de un usuario{}", user);
 
-		if (validateSingupMap(user)) {
+		if (validateSingup(user)) {
 			UserEntity userLocal;
 			try {
 				userLocal = userRepository.findByEmail(user.getEmail());
 			} catch (Exception e) {
-				return getUserException(HttpStatus.INTERNAL_SERVER_ERROR, UserConstant.DB_BAD_CONNECTION);
+				return getException(HttpStatus.INTERNAL_SERVER_ERROR, UserConstant.DB_BAD_CONNECTION);
 			}
 			if (Objects.isNull(userLocal)) {
 				user.setStatus(false);
@@ -53,50 +52,53 @@ public class UserService implements UserCases {
 				try {
 					userRepository.save(user);
 				} catch (Exception e) {
-					return getUserException(HttpStatus.INTERNAL_SERVER_ERROR, UserConstant.DB_BAD_CONNECTION);
+					return getException(HttpStatus.INTERNAL_SERVER_ERROR, UserConstant.DB_BAD_CONNECTION);
 				}
-				return getUserException(HttpStatus.CREATED, UserConstant.SUCCESSFUL);
+				return getException(HttpStatus.CREATED, UserConstant.SUCCESSFUL);
 			} else {
-				return getUserException(HttpStatus.CONFLICT,
-						String.format(UserConstant.EMAIL_CONFLICT, user.getEmail()));
+				return getException(HttpStatus.CONFLICT, String.format(UserConstant.EMAIL_CONFLICT, user.getEmail()));
 			}
 		} else {
-			return getUserException(HttpStatus.BAD_REQUEST, UserConstant.INVALID_DATA);
+			return getException(HttpStatus.BAD_REQUEST, UserConstant.INVALID_DATA);
 		}
 
 	}
 
-	private boolean validateSingupMap(UserEntity user) {
+	private boolean validateSingup(UserEntity user) {
 		return (user.getCedula() != null && user.getEmail() != null && user.getNombre() != null
 				&& user.getPassword() != null);
 	}
 
-	private ResponseEntity<String> getUserException(HttpStatus hs, String m) {
+	private ResponseEntity<String> getException(HttpStatus hs, String m) {
 		return ResponseEntity.status(hs).body(new UserException(m).getMessage());
 	}
 
 	@Override
 	public ResponseEntity<String> login(Map<String, String> requestMap) {
-		log.info("entro a login {}", requestMap);
-		try {
-			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password")));
-			if (authentication.isAuthenticated()) {
-				if (userDetailService.getUserDetail().getStatus()) {
-					return new ResponseEntity<String>(
-							"{\"token\":\"" + jwtUtil.generateToken(userDetailService.getUserDetail().getEmail(),
-									userDetailService.getUserDetail().getRole()) + "\"}",
-							HttpStatus.OK);
-				} else {
-					return new ResponseEntity<String>("{\"mensaje\":\"" + "espere la aprobacion del admin" + "\"}",
-							HttpStatus.BAD_REQUEST);
-				}
+		log.info("entro a login service {}", requestMap);
+		if (authenticate(requestMap)) {
+			UserEntity user = userDetailService.getUserDetail();
+			if (user.getStatus()) {
+				String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+				return ResponseEntity.ok("{\"token\":\"" + token + "\"}");
+			} else {
+				return getException(HttpStatus.BAD_REQUEST,
+						String.format(UserConstant.CUSTOM_V, "espere la aprobacion del admin"));
 			}
-		} catch (Exception e) {
-			log.error("{}", e);
 		}
-		return getUserException(HttpStatus.BAD_REQUEST, String.format(UserConstant.CUSTOM, "credenciales incorrectas"));
+		return getException(HttpStatus.BAD_REQUEST,
+				String.format(UserConstant.CUSTOM_K_V, "mensaje", "credenciales incorrectas"));
+	}
 
+	private boolean authenticate(Map<String, String> requestMap) {
+		try {
+			return authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password")))
+					.isAuthenticated();
+		} catch (Exception e) {
+			e.getMessage();
+			return false;
+		}
 	}
 
 }
