@@ -1,5 +1,6 @@
 package com.manager.backend.application.service;
 
+import java.security.Principal;
 import java.util.Map;
 import java.util.Objects;
 
@@ -80,6 +81,8 @@ public class UserService implements UserCases {
 			UserEntity user = userDetailService.getUserDetail();
 			if (user.getStatus()) {
 				String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+				Principal principal=null;
+				System.out.println(principal);
 				return ResponseEntity.ok("{\"token\":\"" + token + "\"}");
 			} else {
 				return getException(HttpStatus.BAD_REQUEST,
